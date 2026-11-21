@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de días de ciclo | Loops de Marcas Rentables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cian:#4FC3DA;
+    --azul:#02222B;
+    --negro:#101214;
+    --cian-claro:#96E2F0;
+    --hielo:#EAF4F6;
+    --niebla:#9FB8BE;
+    --oro:#D6B43C;
+    --coral:#E8705F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--azul);color:var(--hielo);
+    font-family:'Montserrat',system-ui,sans-serif;font-weight:400;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .grid-bg{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(79,195,218,.055) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(79,195,218,.055) 1px,transparent 1px);
+    background-size:64px 64px;
+  }
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:0 20px 90px}
+
+  header{position:relative;padding:56px 0 34px;text-align:center}
+  .halo{
+    position:absolute;top:-70px;left:50%;transform:translateX(-50%);
+    width:680px;height:460px;max-width:140%;
+    background:radial-gradient(ellipse at center,rgba(79,195,218,.2) 0%,rgba(79,195,218,0) 68%);
+    pointer-events:none;
+  }
+  .logo{position:relative;display:block;width:170px;max-width:48%;height:auto;margin:0 auto 22px}
+  .kicker{
+    position:relative;font-weight:600;font-size:10px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--cian-claro);margin-bottom:16px;
+  }
+  h1{
+    position:relative;font-weight:800;font-size:clamp(28px,5.6vw,44px);
+    letter-spacing:-.03em;line-height:1.12;margin-bottom:16px;
+  }
+  h1 .hl{color:var(--cian)}
+  .bajada{
+    position:relative;font-weight:300;font-size:clamp(14px,2.2vw,16.5px);
+    color:var(--niebla);max-width:520px;margin:0 auto;
+  }
+
+  .panel{
+    background:rgba(234,244,246,.04);border:1px solid rgba(79,195,218,.26);
+    border-radius:18px;padding:24px 22px;margin-top:30px;backdrop-filter:blur(8px);
+  }
+  .panel h2{
+    font-weight:800;font-size:19px;letter-spacing:-.02em;margin-bottom:4px;
+  }
+  .panel .sub{font-weight:300;font-size:13.5px;color:var(--niebla);margin-bottom:20px}
+
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field label{
+    display:block;font-weight:600;font-size:12.5px;color:var(--hielo);margin-bottom:3px;
+  }
+  .field .hint{display:block;font-weight:300;font-size:11.5px;color:var(--niebla);margin-bottom:8px}
+  .row{display:flex;align-items:center;gap:12px}
+  input[type=range]{
+    flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:999px;
+    background:rgba(79,195,218,.22);outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--cian);cursor:pointer;border:3px solid var(--azul);
+    box-shadow:0 0 0 1px rgba(79,195,218,.5);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:var(--cian);cursor:pointer;
+    border:3px solid var(--azul);
+  }
+  .val{
+    flex:0 0 auto;min-width:72px;text-align:right;
+    font-weight:800;font-size:17px;color:var(--cian);letter-spacing:-.01em;
+  }
+  .val small{font-weight:400;font-size:11px;color:var(--niebla);margin-left:3px}
+
+  .money-row{display:flex;gap:10px;align-items:stretch}
+  input[type=text]{
+    flex:1;background:rgba(2,34,43,.6);border:1px solid rgba(79,195,218,.3);
+    border-radius:10px;padding:12px 14px;color:var(--hielo);
+    font-family:inherit;font-weight:600;font-size:16px;outline:none;width:100%;
+  }
+  input[type=text]:focus{border-color:var(--cian)}
+  select{
+    background:rgba(2,34,43,.6);border:1px solid rgba(79,195,218,.3);border-radius:10px;
+    padding:12px 10px;color:var(--hielo);font-family:inherit;font-weight:600;font-size:14px;
+    outline:none;cursor:pointer;
+  }
+
+  /* RESULTADOS */
+  .res{
+    margin-top:26px;background:rgba(79,195,218,.08);
+    border:1px solid rgba(79,195,218,.34);border-radius:18px;padding:26px 22px;text-align:center;
+  }
+  .res .lbl{
+    font-weight:600;font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--cian-claro);margin-bottom:8px;
+  }
+  .big{
+    font-weight:800;font-size:clamp(44px,11vw,68px);color:var(--cian);
+    letter-spacing:-.04em;line-height:1;
+  }
+  .big span{font-size:.35em;letter-spacing:0;color:var(--niebla);font-weight:400;margin-left:6px}
+  .veredicto{
+    margin-top:14px;font-weight:600;font-size:14px;line-height:1.45;
+  }
+  .veredicto.bien{color:var(--cian-claro)}
+  .veredicto.medio{color:var(--oro)}
+  .veredicto.mal{color:var(--coral)}
+
+  .split{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;
+  }
+  .mini{
+    background:rgba(2,34,43,.55);border:1px solid rgba(79,195,218,.2);
+    border-radius:13px;padding:16px 12px;
+  }
+  .mini b{display:block;font-weight:800;font-size:clamp(17px,4.4vw,23px);color:var(--hielo);letter-spacing:-.02em;line-height:1.15}
+  .mini span{display:block;font-weight:400;font-size:10.5px;color:var(--niebla);margin-top:6px;line-height:1.35}
+
+  .desglose{margin-top:22px;text-align:left}
+  .desglose .t{
+    font-weight:600;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--cian-claro);margin-bottom:10px;
+  }
+  .bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:rgba(2,34,43,.6)}
+  .bar i{display:block;height:100%}
+  .leyenda{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px}
+  .leyenda div{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--niebla)}
+  .leyenda em{width:9px;height:9px;border-radius:3px;display:block;flex:0 0 auto}
+
+  .sim{
+    margin-top:26px;border:1px solid rgba(214,180,60,.4);background:rgba(214,180,60,.07);
+    border-radius:16px;padding:20px;
+  }
+  .sim .lbl{
+    font-weight:600;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--oro);margin-bottom:12px;display:block;
+  }
+  .sim p{font-size:14px;line-height:1.55}
+  .sim p b{color:var(--oro);font-weight:800;font-size:17px}
+
+  .nota{
+    margin-top:26px;font-weight:300;font-size:12.5px;color:var(--niebla);
+    border-left:2px solid rgba(79,195,218,.4);padding-left:14px;
+  }
+
+  .cta{
+    margin-top:46px;text-align:center;background:rgba(79,195,218,.07);
+    border:1px solid rgba(79,195,218,.3);border-radius:20px;padding:36px 22px;
+  }
+  .cta h2{font-weight:800;font-size:clamp(21px,4.2vw,28px);letter-spacing:-.025em;margin-bottom:10px}
+  .cta h2 .hl{color:var(--cian)}
+  .cta p{color:var(--niebla);font-weight:300;font-size:14.5px;max-width:440px;margin:0 auto 22px}
+  .btn{
+    display:inline-block;background:var(--cian);color:var(--azul);font-weight:600;
+    font-size:15px;text-decoration:none;padding:14px 32px;border-radius:999px;
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(79,195,218,.3)}
+
+  footer{margin-top:46px;text-align:center;color:var(--niebla);font-size:12px;font-weight:300}
+  footer img{display:block;width:120px;height:auto;margin:0 auto 12px;opacity:.9}
+
+  @media(max-width:520px){
+    .split{grid-template-columns:1fr}
+    .val{min-width:62px;font-size:16px}
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+
+  <header>
+    <div class="halo"></div>
+    <img class="logo" src="logo.png" alt="Loops de Marcas Rentables">
+    <div class="kicker">Calculadora · Ley de Little</div>
+    <h1>¿Tu plata está en el banco <span class="hl">o en el mar?</span></h1>
+    <p class="bajada">Calcula cuántos días pasan entre que le pagas a tu proveedor y cobras del cliente, y cuánto capital tienes congelado ahora mismo.</p>
+  </header>
+
+  <div class="panel">
+    <h2>Tu operación</h2>
+    <p class="sub">Mueve los controles con tus números reales. Si no sabes uno exacto, estima.</p>
+
+    <div class="field">
+      <label for="compra">Cuánto le compras a tu proveedor al mes</label>
+      <span class="hint">El costo de la mercadería, no tus ventas.</span>
+      <div class="money-row">
+        <input type="text" id="compra" inputmode="numeric" value="10.000.000">
+        <select id="moneda">
+          <option value="CLP">CLP</option>
+          <option value="USD">USD</option>
+          <option value="MXN">MXN</option>
+          <option value="COP">COP</option>
+          <option value="PEN">PEN</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="prod">Días de producción en fábrica</label>
+      <span class="hint">Desde que pagas hasta que la mercadería sale.</span>
+      <div class="row"><input type="range" id="prod" min="0" max="120" value="30"><div class="val" id="prodv">30<small>d</small></div></div>
+    </div>
+
+    <div class="field">
+      <label for="transito">Días de tránsito</label>
+      <span class="hint">Barco, avión o lo que uses para traerla.</span>
+      <div class="row"><input type="range" id="transito" min="0" max="90" value="35"><div class="val" id="transitov">35<small>d</small></div></div>
+    </div>
+
+    <div class="field">
+      <label for="aduana">Días de aduana y recepción en bodega</label>
+      <span class="hint">Desaduanaje, traslado y entrada al 3PL.</span>
+      <div class="row"><input type="range" id="aduana" min="0" max="60" value="12"><div class="val" id="aduanav">12<small>d</small></div></div>
+    </div>
+
+    <div class="field">
+      <label for="bodega">Días que el producto pasa en bodega antes de venderse</label>
+      <span class="hint">Si tienes 3.000 unidades y vendes 50 al día, son 60 días.</span>
+      <div class="row"><input type="range" id="bodega" min="0" max="240" value="75"><div class="val" id="bodegav">75<small>d</small></div></div>
+    </div>
+
+    <div class="field">
+      <label for="cobro">Días hasta que la plata llega a tu cuenta</label>
+      <span class="hint">Lo que demora la pasarela o el marketplace en depositarte.</span>
+      <div class="row"><input type="range" id="cobro" min="0" max="90" value="14"><div class="val" id="cobrov">14<small>d</small></div></div>
+    </div>
+
+    <div class="field">
+      <label for="credito">Días de crédito que te da tu proveedor</label>
+      <span class="hint">Si pagas todo por adelantado, déjalo en 0. Esto resta.</span>
+      <div class="row"><input type="range" id="credito" min="0" max="120" value="0"><div class="val" id="creditov">0<small>d</small></div></div>
+    </div>
+  </div>
+
+  <div class="res">
+    <div class="lbl">Tu ciclo de caja</div>
+    <div class="big" id="ciclo">136<span>días</span></div>
+    <div class="veredicto" id="veredicto"></div>
+
+    <div class="split">
+      <div class="mini"><b id="congelado">$0</b><span>Capital congelado en el sistema ahora mismo</span></div>
+      <div class="mini"><b id="vueltas">2,7</b><span>Vueltas que da tu capital al año</span></div>
+    </div>
+
+    <div class="desglose">
+      <div class="t">Dónde se van tus días</div>
+      <div class="bar" id="bar"></div>
+      <div class="leyenda" id="leyenda"></div>
+    </div>
+  </div>
+
+  <div class="sim">
+    <span class="lbl">Qué pasa si lo acortas</span>
+    <p id="simtxt"></p>
+  </div>
+
+  <p class="nota">La Ley de Little dice que lo atrapado en un sistema es igual al ritmo de entrada por el tiempo que tarda en salir. Por eso vender más no arregla la caja: mientras el ciclo no baje, el capital congelado se mantiene igual.</p>
+
+  <div class="cta">
+    <div class="kicker">El siguiente paso</div>
+    <h2>Veamos tu número <span class="hl">en concreto</span></h2>
+    <p>Agenda una llamada con el equipo. Revisamos tu ciclo real, dónde está atrapado tu margen y qué se puede acortar primero.</p>
+    <a class="btn" href="https://links.jaquefunnels.com/widget/booking/8RASvtZb30E9PjHapGkq" target="_blank" rel="noopener">Agendar mi llamada</a>
+  </div>
+
+  <footer>
+    <img src="logo.png" alt="Loops de Marcas Rentables">
+    Duplicamos la facturación de tu marca en 90 días sin depender de agencias.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var SIM = {CLP:'$', USD:'US$', MXN:'$', COP:'$', PEN:'S/'};
+  var campos = ['prod','transito','aduana','bodega','cobro','credito'];
+  var colores = {
+    prod:'#4FC3DA', transito:'#96E2F0', aduana:'#7FA9B5', bodega:'#D6B43C', cobro:'#E8705F'
+  };
+  var nombres = {
+    prod:'Producción', transito:'Tránsito', aduana:'Aduana', bodega:'Bodega', cobro:'Cobro'
+  };
+
+  function soloNum(s){ return (s||'').toString().replace(/[^0-9]/g,''); }
+
+  function fmt(n, moneda){
+    var e = Math.round(n);
+    var s = e.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (SIM[moneda]||'$') + ' ' + s;
+  }
+
+  function corto(n, moneda){
+    var sim = SIM[moneda]||'$';
+    if (n >= 1000000000) return sim + ' ' + (n/1000000000).toFixed(1).replace('.',',') + 'MM';
+    if (n >= 1000000) return sim + ' ' + (n/1000000).toFixed(1).replace('.',',') + 'M';
+    if (n >= 1000) return sim + ' ' + Math.round(n/1000) + 'K';
+    return fmt(n, moneda);
+  }
+
+  function calc(){
+    var vals = {};
+    campos.forEach(function(id){
+      var el = document.getElementById(id);
+      vals[id] = parseInt(el.value, 10);
+      document.getElementById(id+'v').innerHTML = vals[id] + '<small>d</small>';
+    });
+
+    var bruto = vals.prod + vals.transito + vals.aduana + vals.bodega + vals.cobro;
+    var ciclo = bruto - vals.credito;
+    if (ciclo < 0) ciclo = 0;
+
+    var moneda = document.getElementById('moneda').value;
+    var compra = parseInt(soloNum(document.getElementById('compra').value), 10) || 0;
+    var porDia = compra / 30;
+    var congelado = porDia * ciclo;
+    var vueltas = ciclo > 0 ? (365 / ciclo) : 0;
+
+    document.getElementById('ciclo').innerHTML = ciclo + '<span>días</span>';
+    document.getElementById('congelado').textContent = corto(congelado, moneda);
+    document.getElementById('vueltas').textContent = vueltas.toFixed(1).replace('.', ',');
+
+    var v = document.getElementById('veredicto');
+    if (ciclo <= 60){
+      v.className = 'veredicto bien';
+      v.textContent = 'Ciclo sano. Tu capital rota rápido y la caja te acompaña cuando escalas.';
+    } else if (ciclo <= 120){
+      v.className = 'veredicto medio';
+      v.textContent = 'Ciclo apretado. Puedes crecer, pero cada mes bueno te va a tensionar la caja.';
+    } else {
+      v.className = 'veredicto mal';
+      v.textContent = 'Ciclo largo. Vender más aquí no mejora tu caja, la empeora. Primero hay que acortar.';
+    }
+
+    // barra
+    var partes = ['prod','transito','aduana','bodega','cobro'];
+    var bar = document.getElementById('bar');
+    var ley = document.getElementById('leyenda');
+    bar.innerHTML = '';
+    ley.innerHTML = '';
+    partes.forEach(function(p){
+      if (vals[p] <= 0 || bruto <= 0) return;
+      var i = document.createElement('i');
+      i.style.width = (vals[p] / bruto * 100) + '%';
+      i.style.background = colores[p];
+      bar.appendChild(i);
+      var d = document.createElement('div');
+      var em = document.createElement('em');
+      em.style.background = colores[p];
+      d.appendChild(em);
+      d.appendChild(document.createTextNode(nombres[p] + ' ' + vals[p] + 'd'));
+      ley.appendChild(d);
+    });
+
+    // simulacion: bajar 30 dias o el 25%, lo que sea menor
+    var baja = Math.min(30, Math.max(1, Math.round(ciclo * 0.25)));
+    var libera = porDia * baja;
+    var nuevoCiclo = Math.max(0, ciclo - baja);
+    var nuevasVueltas = nuevoCiclo > 0 ? (365 / nuevoCiclo) : 0;
+    document.getElementById('simtxt').innerHTML =
+      'Si recortas <b>' + baja + ' días</b> de tu ciclo, liberas <b>' + corto(libera, moneda) +
+      '</b> de capital que hoy está dormido, y pasas de ' + vueltas.toFixed(1).replace('.',',') +
+      ' a ' + nuevasVueltas.toFixed(1).replace('.',',') + ' vueltas al año con la misma plata.';
+  }
+
+  campos.forEach(function(id){
+    document.getElementById(id).addEventListener('input', calc);
+  });
+  document.getElementById('moneda').addEventListener('change', calc);
+
+  var compraEl = document.getElementById('compra');
+  compraEl.addEventListener('input', function(){
+    var raw = soloNum(compraEl.value);
+    compraEl.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+    calc();
+  });
+
+  calc();
+})();
+</script>
+</body>
+</html>
